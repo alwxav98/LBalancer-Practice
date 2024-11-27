@@ -40,7 +40,8 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo mv /home/ubuntu/* /var/www/html
+            cd /home/ubuntu
+            sudo mv * /var/www/html
 
       - name: Executing remote ssh commands on Server 1
         uses: appleboy/ssh-action@master
@@ -98,7 +99,8 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            sudo mv /home/ubuntu/* /var/www/html
+            cd /home/ubuntu
+            sudo mv * /var/www/html
 
       - name: Executing remote ssh commands on Server 2
         uses: appleboy/ssh-action@master
