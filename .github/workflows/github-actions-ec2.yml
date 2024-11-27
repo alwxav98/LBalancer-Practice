@@ -37,6 +37,17 @@ jobs:
             sudo systemctl enable apache2
             cd home
             sudo mv * /var/www/html
+      #Hostname IP DNS Private
+      - name: Modify index.html for Server 1
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DNS1 }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            PRIVATE_IP=$(hostname -I | awk '{print $1}')
+            sudo sed -i "s/\$(hostname -f)/$PRIVATE_IP/" /path/to/index.html
+            sudo mv /path/to/index.html /var/www/html/index.html
 
       # Deploy to Server 2
       - name: Deploy to Server 2
@@ -60,3 +71,14 @@ jobs:
             sudo systemctl enable apache2
             cd home
             sudo mv * /var/www/html
+      #Hostname IP DNS Private
+      - name: Modify index.html for Server 2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DNS2 }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            PRIVATE_IP=$(hostname -I | awk '{print $1}')
+            sudo sed -i "s/\$(hostname -f)/$PRIVATE_IP/" /path/to/index.html
+            sudo mv /path/to/index.html /var/www/html/index.html
