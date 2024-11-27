@@ -46,8 +46,14 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             PRIVATE_IP=$(hostname -I | awk '{print $1}')
-            sudo sed -i "s/\$(hostname -f)/$PRIVATE_IP/" /path/to/index.html
-            sudo mv /path/to/index.html /var/www/html/index.html
+            FILE_PATH="/home/index.html"
+            if [ -f "$FILE_PATH" ]; then
+              sudo sed -i "s/\$(hostname -f)/$PRIVATE_IP/" "$FILE_PATH"
+              sudo mv "$FILE_PATH" /var/www/html/index.html
+            else
+              echo "Error: File $FILE_PATH not found."
+              exit 1
+            fi
 
       # Deploy to Server 2
       - name: Deploy to Server 2
@@ -80,5 +86,11 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             PRIVATE_IP=$(hostname -I | awk '{print $1}')
-            sudo sed -i "s/\$(hostname -f)/$PRIVATE_IP/" /path/to/index.html
-            sudo mv /path/to/index.html /var/www/html/index.html
+            FILE_PATH="/home/index.html"
+            if [ -f "$FILE_PATH" ]; then
+              sudo sed -i "s/\$(hostname -f)/$PRIVATE_IP/" "$FILE_PATH"
+              sudo mv "$FILE_PATH" /var/www/html/index.html
+            else
+              echo "Error: File $FILE_PATH not found."
+              exit 1
+            fi
