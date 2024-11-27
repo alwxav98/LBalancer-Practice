@@ -22,7 +22,25 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
           REMOTE_HOST: ${{ secrets.HOST_DNS1 }}
           REMOTE_USER: ${{ secrets.USERNAME }}
-          TARGET: ${{ secrets.TARGET_DIR }}
+          TARGET: /home/ubuntu
+      - name: Verify files after deployment
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DNS1 }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "Listing contents of /home/ubuntu:"
+            ls -l /home/ubuntu
+
+      - name: Move files to Apache directory
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DNS1 }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo mv /home/ubuntu/* /var/www/html
 
       - name: Executing remote ssh commands on Server 1
         uses: appleboy/ssh-action@master
@@ -62,7 +80,25 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
           REMOTE_HOST: ${{ secrets.HOST_DNS2 }}
           REMOTE_USER: ${{ secrets.USERNAME }}
-          TARGET: ${{ secrets.TARGET_DIR }}
+          TARGET: /home/ubuntu
+      - name: Verify files after deployment
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DNS2 }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "Listing contents of /home/ubuntu:"
+            ls -l /home/ubuntu
+
+      - name: Move files to Apache directory
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DNS2 }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo mv /home/ubuntu/* /var/www/html
 
       - name: Executing remote ssh commands on Server 2
         uses: appleboy/ssh-action@master
