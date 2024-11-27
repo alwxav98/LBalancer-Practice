@@ -23,7 +23,8 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST_DNS1 }}
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: /home/ubuntu
-      - name: Verify files after deployment
+
+      - name: Verify files after deployment on Server 1
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS1 }}
@@ -33,26 +34,7 @@ jobs:
             echo "Listing contents of /home/ubuntu:"
             ls -l /home/ubuntu
 
-      - name: Move files to Apache directory
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST_DNS1 }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /home/ubuntu
-            sudo mv * /var/www/html
-      - name: Verify files in Apache directory
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST_DNS1 }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            echo "Listing contents of /var/www/html:"
-            ls -l /var/www/html
-
-      - name: Executing remote ssh commands on Server 1
+      - name: Install Apache and move files to Apache directory on Server 1
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS1 }}
@@ -63,9 +45,18 @@ jobs:
             sudo apt-get install -y apache2
             sudo systemctl start apache2
             sudo systemctl enable apache2
-            cd home
-            sudo mv * /var/www/html
-      #Hostname IP DNS Private
+            sudo mv /home/ubuntu/* /var/www/html
+
+      - name: Verify files in Apache directory on Server 1
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DNS1 }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "Listing contents of /var/www/html:"
+            ls -l /var/www/html
+
       - name: Modify index.html for Server 1
         uses: appleboy/ssh-action@master
         with:
@@ -74,16 +65,15 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             PRIVATE_IP=$(hostname -I | awk '{print $1}')
-            FILE_PATH="/home/index.html"
+            FILE_PATH="/var/www/html/index.html"
             if [ -f "$FILE_PATH" ]; then
               sudo sed -i "s/\$(hostname -f)/$PRIVATE_IP/" "$FILE_PATH"
-              sudo mv "$FILE_PATH" /var/www/html/index.html
             else
               echo "Error: File $FILE_PATH not found."
               exit 1
             fi
 
-      # Deploy to Server 2
+      # Deploy to Server 2 (similar steps as Server 1)
       - name: Deploy to Server 2
         uses: easingthemes/ssh-deploy@main
         env:
@@ -91,7 +81,8 @@ jobs:
           REMOTE_HOST: ${{ secrets.HOST_DNS2 }}
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: /home/ubuntu
-      - name: Verify files after deployment
+
+      - name: Verify files after deployment on Server 2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS2 }}
@@ -101,27 +92,7 @@ jobs:
             echo "Listing contents of /home/ubuntu:"
             ls -l /home/ubuntu
 
-      - name: Move files to Apache directory
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST_DNS2 }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /home/ubuntu
-            sudo mv * /var/www/html
-
-      - name: Verify files in Apache directory
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST_DNS2 }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            echo "Listing contents of /var/www/html:"
-            ls -l /var/www/html
-
-      - name: Executing remote ssh commands on Server 2
+      - name: Install Apache and move files to Apache directory on Server 2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS2 }}
@@ -132,9 +103,18 @@ jobs:
             sudo apt-get install -y apache2
             sudo systemctl start apache2
             sudo systemctl enable apache2
-            cd home
-            sudo mv * /var/www/html
-      #Hostname IP DNS Private
+            sudo mv /home/ubuntu/* /var/www/html
+
+      - name: Verify files in Apache directory on Server 2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DNS2 }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "Listing contents of /var/www/html:"
+            ls -l /var/www/html
+
       - name: Modify index.html for Server 2
         uses: appleboy/ssh-action@master
         with:
@@ -143,10 +123,9 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             PRIVATE_IP=$(hostname -I | awk '{print $1}')
-            FILE_PATH="/home/index.html"
+            FILE_PATH="/var/www/html/index.html"
             if [ -f "$FILE_PATH" ]; then
               sudo sed -i "s/\$(hostname -f)/$PRIVATE_IP/" "$FILE_PATH"
-              sudo mv "$FILE_PATH" /var/www/html/index.html
             else
               echo "Error: File $FILE_PATH not found."
               exit 1
