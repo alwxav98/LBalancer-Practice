@@ -132,7 +132,7 @@ jobs:
             fi
 
       # Deploy to Server 3 (similar steps as Server 1)
-      - name: Deploy to Server 2
+      - name: Deploy to Server 3
         uses: easingthemes/ssh-deploy@main
         env:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
@@ -140,7 +140,7 @@ jobs:
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: /home/ubuntu
 
-      - name: Verify files after deployment on Server 2
+      - name: Verify files after deployment on Server 3
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS3 }}
@@ -163,7 +163,7 @@ jobs:
             sudo systemctl enable apache2
             sudo mv /home/ubuntu/* /var/www/html
 
-      - name: Verify files in Apache directory on Server 2
+      - name: Verify files in Apache directory on Server 3
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS3 }}
@@ -173,7 +173,7 @@ jobs:
             echo "Listing contents of /var/www/html:"
             ls -l /var/www/html
 
-      - name: Modify index.html for Server 2
+      - name: Modify index.html for Server 3
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS3 }}
