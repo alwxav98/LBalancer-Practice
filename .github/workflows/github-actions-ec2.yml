@@ -50,7 +50,7 @@ jobs:
       - name: Verify files in Apache directory on Server 1
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST_DNS1 }}
+          host: ${{ secrets.HOST_DNS2 }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
@@ -60,7 +60,7 @@ jobs:
       - name: Modify index.html for Server 1
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST_DNS1 }}
+          host: ${{ secrets.HOST_DNS2 }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
@@ -130,17 +130,17 @@ jobs:
               echo "Error: File $FILE_PATH not found."
               exit 1
             fi
-
-      # Deploy to Server 3 (similar steps as Server 1)
+            
+            # Deploy to Server 2 (similar steps as Server 1)
       - name: Deploy to Server 3
         uses: easingthemes/ssh-deploy@main
         env:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.HOST_DNS3 }}
+          REMOTE_HOST: ${{ secrets.INSTANCE3_DNS }}
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: /home/ubuntu
 
-      - name: Verify files after deployment on Server 3
+      - name: Verify files after deployment on Server 2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS3 }}
@@ -150,7 +150,7 @@ jobs:
             echo "Listing contents of /home/ubuntu:"
             ls -l /home/ubuntu
 
-      - name: Install Apache and move files to Apache directory on Server 3
+      - name: Install Apache and move files to Apache directory on Server 2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS3 }}
@@ -163,7 +163,7 @@ jobs:
             sudo systemctl enable apache2
             sudo mv /home/ubuntu/* /var/www/html
 
-      - name: Verify files in Apache directory on Server 3
+      - name: Verify files in Apache directory on Server 2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS3 }}
@@ -173,7 +173,7 @@ jobs:
             echo "Listing contents of /var/www/html:"
             ls -l /var/www/html
 
-      - name: Modify index.html for Server 3
+      - name: Modify index.html for Server 2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_DNS3 }}
