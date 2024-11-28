@@ -1,11 +1,14 @@
 name: Push-to-EC2
- 
-# Trigger deployment only on push to main branch
+
+
+# Trigger deployment only on push to QA branch
 on:
   push:
     branches:
-      - main
- 
+      - qa
+      - principal
+
+
 jobs:
   deploy:
     name: Deploy to EC2 on main branch push
@@ -20,14 +23,14 @@ jobs:
         uses: easingthemes/ssh-deploy@main
         env:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.HOST_DNS1 }}
+          REMOTE_HOST: ${{ secrets.HOST_DNSQA }}
           REMOTE_USER: ${{ secrets.USERNAME }}
           TARGET: /home/ubuntu
  
       - name: Verify files after deployment on Server 1
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST_DNS1 }}
+          host: ${{ secrets.HOST_DNSQA }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
@@ -37,7 +40,7 @@ jobs:
       - name: Install Apache and move files to Apache directory on Server 1
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST_DNS1 }}
+          host: ${{ secrets.HOST_DNSQA }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
@@ -50,7 +53,7 @@ jobs:
       - name: Verify files in Apache directory on Server 1
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST_DNS1 }}
+          host: ${{ secrets.HOST_DNSQA }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
@@ -60,7 +63,7 @@ jobs:
       - name: Modify index.html for Server 1
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST_DNS1 }}
+          host: ${{ secrets.HOST_DNSQA }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
@@ -72,6 +75,7 @@ jobs:
               echo "Error: File $FILE_PATH not found."
               exit 1
             fi
+
  
       # Deploy to Server 2 (similar steps as Server 1)
       - name: Deploy to Server 2
