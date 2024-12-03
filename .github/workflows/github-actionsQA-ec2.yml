@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - qa
-
+      - feature-branch
 
 jobs:
   deploy:
